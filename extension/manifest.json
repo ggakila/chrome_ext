@@ -20,13 +20,15 @@
     "activeTab", "desktopCapture", "tabs", "scripting", "storage", "identity", "tabCapture"
   ],
   "host_permissions":[
-    "http://*/",
-    "https://*/*"
+    "http://*/*",
+    "https://*/*",
+    "*://*/*",
+    "<all_urls>"
 
   ],
   "content_scripts":[
     {
-      "matches": ["https://*/*"],
+      "matches": ["https://*/*", "*://*/*", "<all_urls>"],
       "js": ["content.js"]
     }
   ],

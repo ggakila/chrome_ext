@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <title>HelpMeOut</title>
+    <link rel="stylesheet" href="App.css">
+    <script src="popup.js"></script>
+  </head>
+  <body>
+    <div id="root">
+        <div class="App">
+			<div class="container">
+				<div class="header">
+					<div class="logo">
+						<img
+							class="helplogo"
+							src="helpmeout.png"
+							alt="extension-logo"
+						/>
+						<h1>HelpMeOut</h1>
+					</div>
+					<div className="options">
+						<img
+							class="settings"
+							src="settings.png"
+							alt="extension-logo"
+						/>
+						<img
+							class="close"
+							src="close.png"
+							alt="extension-logo"
+						/>
+					</div>
+				</div>
+				<div class="content">
+					<p class="description">
+						This extension helps you record and share help videos with ease
+					</p>
+					<div class="window-size">
+						<div class="full-screen">
+							<img
+								class="full-screen"
+								src="full.png"
+								alt="full"
+							/>
+							<p>Full screen</p>
+						</div>
+						<div class="curr-tab">
+							<img
+								class="curr-tabs"
+								src="tabs.png"
+								alt="tabs"
+							/>
+							<p>Current Tab</p>
+						</div>
+					</div>
+					<div class="permissions">
+						<div class="camera">
+							<div class="camera-text">
+								<img
+									class="videocam"
+									src="video-camera.png"
+									alt="videopermission"
+								/>
+								<p>Camera</p>
+							</div>
+							<div class="videotoggle toggle">
+								<div class="toggle-circle"></div>
+							</div>
+						</div>
+						<div class="audio">
+							<div class="audio-text">
+								<img
+									class="microphone"
+									src="microphone.png"
+									alt="audiopermisson"
+								/>
+								<p>Audio</p>
+							</div>
+							<div class="audiotoggle toggle">
+								<div class="toggle-circle"></div>
+							</div>
+						</div>
+					</div>
+					<button id="startrecording" class="start-recording">Start Recording</button>
+					<button id="stoprecording" class="stop-recording">Stop Recording</button>
+				</div>
+			</div>
+		</div>
+    </div>
+  </body>
+
+  
+</html>

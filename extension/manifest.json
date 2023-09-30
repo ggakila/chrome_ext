@@ -21,8 +21,14 @@
   ],
   "host_permissions":[
     "http://*/",
-        "https://*/*"
+    "https://*/*"
 
+  ],
+  "content_scripts":[
+    {
+      "matches": ["https://*/*"],
+      "js": ["content.js"]
+    }
   ],
   "commands": {
     "_execute_action": {

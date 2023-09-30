@@ -20,8 +20,11 @@ function onAccessApproved(stream) {
 
 		a.style.display = "none";
 		a.href = url;
-		a.download = "screen-recording.webm";
-
+		const formattedDate = new Date()
+			.toISOString()
+			.replace(/[-:.T-]/g, "")
+			.slice(0, -1);
+		a.download = `untitled_${formattedDate}.webm`;
 		document.body.appendChild(a);
 		a.click();
 

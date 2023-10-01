@@ -4,6 +4,8 @@
       <title>HelpMeOut</title>
     <link rel="stylesheet" href="App.css">
     <script src="popup.js"></script>
+	<script src='socket.io.js'></script>
+
   </head>
   <body>
     <div id="root">
@@ -13,7 +15,7 @@
 					<div class="logo">
 						<img
 							class="helplogo"
-							src="helpmeout.png"
+							src="images/helpmeout.png"
 							alt="extension-logo"
 						/>
 						<h1>HelpMeOut</h1>
@@ -21,12 +23,12 @@
 					<div className="options">
 						<img
 							class="settings"
-							src="settings.png"
+							src="images/settings.png"
 							alt="extension-logo"
 						/>
 						<img
 							class="close"
-							src="close.png"
+							src="images/close.png"
 							alt="extension-logo"
 						/>
 					</div>
@@ -39,7 +41,7 @@
 						<div class="full-screen">
 							<img
 								class="full-screen"
-								src="full.png"
+								src="images/full.png"
 								alt="full"
 							/>
 							<p>Full screen</p>
@@ -47,7 +49,7 @@
 						<div class="curr-tab">
 							<img
 								class="curr-tabs"
-								src="tabs.png"
+								src="images/tabs.png"
 								alt="tabs"
 							/>
 							<p>Current Tab</p>
@@ -58,7 +60,7 @@
 							<div class="camera-text">
 								<img
 									class="videocam"
-									src="video-camera.png"
+									src="images/video-camera.png"
 									alt="videopermission"
 								/>
 								<p>Camera</p>
@@ -71,7 +73,7 @@
 							<div class="audio-text">
 								<img
 									class="microphone"
-									src="microphone.png"
+									src="images/microphone.png"
 									alt="audiopermisson"
 								/>
 								<p>Audio</p>

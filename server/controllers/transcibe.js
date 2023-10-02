@@ -3,6 +3,10 @@ const amqp = require("amqplib");
 const fs = require("fs");
 const videPath = "/uploads";
 const path = require("path");
+const http = require('http');
+const https = require('https');
+
+
 const ffmpegStatic = require("ffmpeg-static");
 import prisma from '../utils/client';
 
@@ -35,7 +39,7 @@ deepgram.transcription.preRecorded(
 //send msg to be added to raabitmq queue
 const sendTranscibeJob = async (sessionId) => {
   try {
-    const connection = await amqp.connect("amqp://18.119.101.235:15672");
+    const connection = await amqp.connect("amqp://eriq:root2020@18.119.101.235:15672");
     const channel = await connection.createChannel();
     const queue = "transcribe";
     const exchangeName = "videoQueue";
@@ -101,7 +105,7 @@ const transcribeVideo = async (sessionId) => {
 //consume message from rabbitmq queue
 const consumeTranscribeJob = async () => {
   try {
-    const connection = await amqp.connect("amqp://18.119.101.235:15672");
+    const connection = await amqp.connect("amqp://eriq:root2020@18.119.101.235:15672");
     const channel = await connection.createChannel();
     const queue = "transcribe";
     const exchangeName = "videoQueue";

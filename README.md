@@ -27,4 +27,12 @@ fetch(`http://localhost:5000/api/startstream`, {
     console.error("Session Error:", error);
   });
 ```
-
+### Example of Response
+{
+    "session": {
+        "id": "cln8o0og00000uzwjelhljbyl",
+        "createdAt": "2023-10-02T09:05:11.616Z",
+        "updatedAt": "2023-10-02T09:05:11.616Z",
+        "active": true
+    }
+}

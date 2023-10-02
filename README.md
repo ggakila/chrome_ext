@@ -10,7 +10,7 @@ The "Start Recording" endpoint initiates the screen recording process. It reques
 
 ### Usage
 
-- **Endpoint**: `[http://18.119.101.235:3000/api/startstream](http://ec2-18-119-101-235.us-east-2.compute.amazonaws.com:3000/api/startstream)`
+- **Endpoint**: [http://18.119.101.235:3000/api/startstream](http://ec2-18-119-101-235.us-east-2.compute.amazonaws.com:3000/api/startstream)
 - **HTTP Method**: GET
 
 ### Example
@@ -46,7 +46,7 @@ fetch(`http://18.119.101.235:3000/api/startstream`, {
 This endpoint allows you to upload video data to the server. The uploaded video data will be appended to an existing file or create a new file if it doesn't exist. Additionally, the metadata of the uploaded video will be stored in a database.
 
 ### Endpoint
-`[http://18.119.101.235:3000/api/stream/${sessionId}](http://ec2-18-119-101-235.us-east-2.compute.amazonaws.com:3000/api/stream/${sessionId})`
+[http://18.119.101.235:3000/api/stream/${sessionId}](http://ec2-18-119-101-235.us-east-2.compute.amazonaws.com:3000/api/stream/${sessionId})
 
 ### Example
 ```

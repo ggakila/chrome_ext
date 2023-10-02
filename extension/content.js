@@ -1,20 +1,33 @@
 
 var screenrecorder = null;
 var audioStream = null;
-const blobs = [];
-let previousBlobsCount = 0;
+let blobs = [];
 let url;
 
+let sessionId;
 function onAccessApproved(videoStream, audioStream) {
-	
 	const mediaStream = new MediaStream();
 	videoStream.getTracks().forEach((track) => mediaStream.addTrack(track));
 	audioStream.getTracks().forEach((track) => mediaStream.addTrack(track));
 
 	screenrecorder = new MediaRecorder(mediaStream);
+
 	let videoChunks = [];
 	console.log("videoChunks:", videoChunks);
 	screenrecorder.start(1000);
+	
+	fetch(`http://localhost:5000/api/startstream`, {
+		method: "GET",
+	})
+		.then((response) => response.json())
+		.then((response) => {
+			
+			sessionId = response.session.id;
+		})
+		.catch((error) => {
+			console.error("Session Error:", error);
+		});
+
 
 	screenrecorder.onstop = function () {
 		mediaStream.getTracks().forEach(function (track) {
@@ -22,19 +35,21 @@ function onAccessApproved(videoStream, audioStream) {
 				track.stop();
 			}
 		});
+		
 	};
 
 	screenrecorder.ondataavailable = function (event) {
 		if (event.data.size > 0) {
-			console.log("inside event size");
 			videoChunks.push(event.data);
 
 			blobs.push(event.data);
 			url = URL.createObjectURL(event.data);
+
 		}
 		console.log("video-chunks:", videoChunks);
 		let recordedBlob = event.data;
-		sendLastBlobToServer(recordedBlob);
+		
+		sendLastBlobToServer(recordedBlob, sessionId);
 		let a = document.createElement("a");
 
 		a.style.display = "none";
@@ -45,10 +60,10 @@ function onAccessApproved(videoStream, audioStream) {
 			.slice(0, -1);
 		a.download = `untitled_${formattedDate}.webm`;
 		document.body.appendChild(a);
-		a.click();
+		// a.click();
 
 		document.body.removeChild(a);
-
+		
 		URL.revokeObjectURL(url);
 	};
 }
@@ -59,9 +74,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 		sendResponse(`${message.action} success`);
 
-		// Get audio and video streams separately
 		navigator.mediaDevices
 			.getDisplayMedia({
+				audio: true,
 				video: {
 					width: 9999999999,
 					height: 9999999999,
@@ -70,17 +85,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 			.then((videoStream) => {
 				navigator.mediaDevices
 					.getUserMedia({ audio: true })
-					.then((audio) => {
+					.then( (audio) => {
 						audioStream = audio; // Store the audio stream
 						onAccessApproved(videoStream, audioStream);
 					})
 					.catch((error) => {
 						console.error("Error accessing audio:", error);
 					});
-			})
-			.catch((error) => {
+				
+			}).catch((error) => {
 				console.error("Error accessing video:", error);
 			});
+
 	}
 
 	if (message.action === "stoprecording") {
@@ -92,28 +108,42 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 	}
 });
 
-function sendLastBlobToServer(blob) {
+function sendLastBlobToServer(blob, sessionId) {
 	if (blobs.length === 0) {
-		return;
+		return; 
 	}
 
 	const lastBlob = blobs[blobs.length - 1];
 
 	const formData = new FormData();
-	formData.append("video", blob, "recorded_video.webm");
+	formData.append("video", lastBlob, "recorded_video.webm");
+	if (!sessionId) {
+		console.log(sessionId)
+		console.log("no session id");
+		return;
+	}
 
-	fetch("http://localhost:5000/api/upload", {
+	fetch(`http://localhost:5000/api/stream/${sessionId}`, {
 		method: "POST",
 		body: formData,
-	})
+		})
 		.then((response) => response.json())
 		.then((result) => {
-			console.log("Success:", result);
+		console.log("Success:", result);
+		})
+		.catch((error) => {
+		console.error("Error:", error);
+		});
+}	
+
+const startRecording = () => {
+	fetch(`serverUrl/startstream`)
+		.then((response) => response.json())
+		.then((session) => {
+			console.log("Success:", session);
+			sesisonId = session.id;
 		})
 		.catch((error) => {
 			console.error("Error:", error);
 		});
-
-	// Clear the blobs array after sending the last blob
-	previousBlobsCount += 1;
-}
+	}

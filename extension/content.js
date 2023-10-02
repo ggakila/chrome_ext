@@ -4,6 +4,7 @@ var audioStream = null;
 let blobs = [];
 let url;
 
+
 let sessionId;
 function onAccessApproved(videoStream, audioStream) {
 	const mediaStream = new MediaStream();
@@ -136,14 +137,3 @@ function sendLastBlobToServer(blob, sessionId) {
 		});
 }	
 
-const startRecording = () => {
-	fetch(`serverUrl/startstream`)
-		.then((response) => response.json())
-		.then((session) => {
-			console.log("Success:", session);
-			sesisonId = session.id;
-		})
-		.catch((error) => {
-			console.error("Error:", error);
-		});
-	}

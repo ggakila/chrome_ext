@@ -3,9 +3,9 @@ const router = express.Router();
 const uploadController = require("../controllers/upload");
 const multer = require("multer");
 const path = require('path');
+const upload = require("../middlewares/uploadmiddleware");
 
 const {
-  uploadVideo,
   getAllVideos,
   getSingleVideo,
   deleteVideo,
@@ -13,21 +13,19 @@ const {
   deleteAllVideos,
 } = uploadController;
 
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const destinationPath = '/home/eriq/projects/chrome_ext/server/uploads';
-    cb(null, destinationPath); // Uploads will be stored in the 'uploads' directory
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
-  },
-});
+const {
+  startSession,
+  stopSession,
+  uploadVideo,
+} = require("../controllers/stream");
 
-const upload = multer({ storage: storage });
+// stream: POST
+router.get("/startstream", startSession);
+router.post("/stream/:sessionId", upload.single('video'),  uploadVideo);
+router.get("/stopstream", stopSession);
 
-// upload video: POST
-router.post("/upload", upload.single("video"), uploadVideo);
+
+router.post("/upload", upload.single('video'), uploadVideo);
 
 router.get("/", (req, res) => {
   res.send("Hello World!");

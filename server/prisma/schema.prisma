@@ -11,14 +11,14 @@ datasource db {
 }
 
 model Video {
-  id          String   @id @default(cuid())
-  title       String
-  description String?  @default("")
-  url         String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  sessions    Session? @relation(fields: [sessionId], references: [id])
-  sessionId   String?
+  id        String   @id @default(cuid())
+  title     String
+  size      String?  @default("")
+  url       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  session   Session? @relation(fields: [sessionId], references: [id])
+  sessionId String?  @unique
 }
 
 model Session {
@@ -26,4 +26,5 @@ model Session {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   chunks    Video[]
+  active    Boolean  @default(true)
 }

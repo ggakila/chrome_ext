@@ -3,8 +3,6 @@ const prisma = require('../utils/client');
 const streamifier = require("streamifier");
 const fs = require("fs");
 
-
-
 const uploadVideo = async (req, res) => {
     try {
         
@@ -27,7 +25,7 @@ const uploadVideo = async (req, res) => {
                 url: path,
             },
         });
-        
+
         fs.appendFile(directoryPath, data, (err) => {
             if (err) {
                 console.error('Error appending chunk:', err);

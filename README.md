@@ -87,4 +87,31 @@ function sendLastBlobToServer(blob, sessionId) {
 }
 ```
 
+# Video Streaming Endpoint
+
+This documentation provides information on how to use the Video Streaming Endpoint to stream video content from the server to clients. The endpoint allows clients to request specific byte ranges of a video file, making it suitable for video streaming applications.
+
+## Endpoint URL
+
+- **URL**: `/api/streamvideo/:videoId`
+  - `:videoId`: The unique identifier of the video to be streamed.
+
+## Request
+
+### HTTP Method
+
+- `GET`
+
+### Headers
+
+- `Range`: Specifies the byte range to request in the format `bytes=start-end`.
+
+### Example Request
+
+```http
+GET http://localhost:5000/api/streamvideo/${sessionId}
+Range: bytes=0-999
+```
+
+
 ### Will be provided in swagger during subission 🙂

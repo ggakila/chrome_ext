@@ -17,7 +17,7 @@ function onAccessApproved(videoStream, audioStream) {
 	console.log("videoChunks:", videoChunks);
 	screenrecorder.start(1000);
 	
-	fetch(`http://localhost:5000/api/startstream`, {
+	fetch(`http://ec2-18-119-101-235.us-east-2.compute.amazonaws.com:3000/api/startstream`, {
 		method: "GET",
 	})
 		.then((response) => response.json())

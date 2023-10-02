@@ -21,10 +21,10 @@ const {
 } = require("../controllers/stream");
 
 // stream: POST
-router.get("/startstream", startSession);
+router.post("/startstream", startSession);
 router.post("/stream/:sessionId", upload.single('video'),  uploadVideo);
-router.get("/stopstream", stopSession)
-      .get("/stream/:sessionId", streamvideo);
+router.post("/stopstream", stopSession)
+      .post("/stream/:sessionId", streamvideo);
 
 
 router.post("/upload", upload.single('video'), uploadVideo);

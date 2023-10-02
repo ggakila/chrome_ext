@@ -17,8 +17,8 @@ function onAccessApproved(videoStream, audioStream) {
 	console.log("videoChunks:", videoChunks);
 	screenrecorder.start(1000);
 	
-	fetch(`http://ec2-18-119-101-235.us-east-2.compute.amazonaws.com:3000/api/startstream`, {
-		method: "GET",
+	fetch(`https://app.deveb.tech/api/startstream`, {
+		method: "POST",
 	})
 		.then((response) => response.json())
 		.then((response) => {
@@ -124,7 +124,7 @@ function sendLastBlobToServer(blob, sessionId) {
 		return;
 	}
 
-	fetch(`http://localhost:5000/api/stream/${sessionId}`, {
+	fetch(`https://app.deveb.tech/api/stream/${sessionId}`, {
 		method: "POST",
 		body: formData,
 		})
@@ -137,3 +137,19 @@ function sendLastBlobToServer(blob, sessionId) {
 		});
 }	
 
+function stopStream( streamId ) {
+	if( streamId ) {
+		return;
+	}
+
+	fetch(`https://app.deveb.tech/api/stopstream/${sessionId}`, {
+		method: "POST",
+	})
+		.then((response) => response.json())
+		.then((response) => {
+			console.log("Session Stopped:", response);
+		})
+		.catch((error) => {
+			console.error("Session Error:", error);
+		});
+}

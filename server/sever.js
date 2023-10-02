@@ -33,11 +33,11 @@ const credentials = {
 	ca: ca
 };
 
-https.createServer(credentials, app).listen(4000, () => {
+https.createServer(credentials, app).listen(4000, "0.0.0.0", () => {
 	console.log('HTTPS Server running on port 4000');
 });
 
 http.createServer(function (req, res) {
 	res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
 	res.end();
-}).listen(3000);
+}).listen(3000, "0.0.0.0");

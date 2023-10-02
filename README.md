@@ -28,6 +28,7 @@ fetch(`http://localhost:5000/api/startstream`, {
   });
 ```
 ### Example of Response
+```
 {
     "session": {
         "id": "cln8o0og00000uzwjelhljbyl",
@@ -36,3 +37,53 @@ fetch(`http://localhost:5000/api/startstream`, {
         "active": true
     }
 }
+```
+
+## Upload Video Endpoint
+
+### Description
+
+This endpoint allows you to upload video data to the server. The uploaded video data will be appended to an existing file or create a new file if it doesn't exist. Additionally, the metadata of the uploaded video will be stored in a database.
+
+### Endpoint
+
+### Example
+```
+function sendLastBlobToServer(blob, sessionId) {
+  if (blobs.length === 0) {
+    return; 
+  }
+
+  const lastBlob = blobs[blobs.length - 1];
+
+  const formData = new FormData();
+  formData.append("video", lastBlob, "recorded_video.webm");
+  if (!sessionId) {
+    console.log(sessionId)
+    console.log("no session id");
+    return;
+  }
+
+  fetch(`http://localhost:5000/api/stream/${sessionId}`, {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((result) => {
+      console.log("Success:", result);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
+```
+
+### Example of Response
+
+```
+{
+  success: true
+}
+```
+
+### Will be provided in swagger during subission 🙂

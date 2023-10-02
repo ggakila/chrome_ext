@@ -10,13 +10,13 @@ The "Start Recording" endpoint initiates the screen recording process. It reques
 
 ### Usage
 
-- **Endpoint**: `http://localhost:5000/api/startstream`
+- **Endpoint**: [http://18.119.101.235:3000/api/startstream](http://ec2-18-119-101-235.us-east-2.compute.amazonaws.com:3000/api/startstream)
 - **HTTP Method**: GET
 
 ### Example
 
 ```javascript
-fetch(`http://localhost:5000/api/startstream`, {
+fetch(`http://18.119.101.235:3000/api/startstream`, {
   method: "GET",
 })
   .then((response) => response.json())
@@ -27,4 +27,91 @@ fetch(`http://localhost:5000/api/startstream`, {
     console.error("Session Error:", error);
   });
 ```
+### Example of Response
+```
+{
+    "session": {
+        "id": "cln8o0og00000uzwjelhljbyl",
+        "createdAt": "2023-10-02T09:05:11.616Z",
+        "updatedAt": "2023-10-02T09:05:11.616Z",
+        "active": true
+    }
+}
+```
 
+## Upload Video Endpoint
+
+### Description
+
+This endpoint allows you to upload video data to the server. The uploaded video data will be appended to an existing file or create a new file if it doesn't exist. Additionally, the metadata of the uploaded video will be stored in a database.
+
+### Endpoint
+[http://18.119.101.235:3000/api/stream/${sessionId}](http://ec2-18-119-101-235.us-east-2.compute.amazonaws.com:3000/api/stream/${sessionId})
+
+### Example
+```
+function sendLastBlobToServer(blob, sessionId) {
+  if (blobs.length === 0) {
+    return; 
+  }
+
+  const lastBlob = blobs[blobs.length - 1];
+
+  const formData = new FormData();
+  formData.append("video", lastBlob, "recorded_video.webm");
+  if (!sessionId) {
+    console.log(sessionId)
+    console.log("no session id");
+    return;
+  }
+
+  fetch(`http://localhost:5000/api/stream/${sessionId}`, {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((result) => {
+      console.log("Success:", result);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
+```
+
+### Example of Response
+
+```
+{
+  success: true
+}
+```
+
+# Video Streaming Endpoint
+
+This documentation provides information on how to use the Video Streaming Endpoint to stream video content from the server to clients. The endpoint allows clients to request specific byte ranges of a video file, making it suitable for video streaming applications.
+
+## Endpoint URL
+
+- **URL**: `/api/streamvideo/:videoId`
+  - `:videoId`: The unique identifier of the video to be streamed.
+
+## Request
+
+### HTTP Method
+
+- `GET`
+
+### Headers
+
+- `Range`: Specifies the byte range to request in the format `bytes=start-end`.
+
+### Example Request
+
+```http
+GET http://localhost:5000/api/streamvideo/${sessionId}
+Range: bytes=0-999
+```
+
+
+### Will be provided in swagger during subission 🙂

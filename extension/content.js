@@ -1,31 +1,36 @@
 
 var screenrecorder = null;
+var audioStream = null;
 const blobs = [];
 let previousBlobsCount = 0;
 let url;
-function onAccessApproved(stream) {
-	screenrecorder = new MediaRecorder(stream);
+
+function onAccessApproved(videoStream, audioStream) {
+	
+	const mediaStream = new MediaStream();
+	videoStream.getTracks().forEach((track) => mediaStream.addTrack(track));
+	audioStream.getTracks().forEach((track) => mediaStream.addTrack(track));
+
+	screenrecorder = new MediaRecorder(mediaStream);
 	let videoChunks = [];
 	console.log("videoChunks:", videoChunks);
 	screenrecorder.start(1000);
 
 	screenrecorder.onstop = function () {
-		stream.getTracks().forEach(function (track) {
+		mediaStream.getTracks().forEach(function (track) {
 			if (track.readyState === "live") {
 				track.stop();
 			}
 		});
-		
 	};
 
 	screenrecorder.ondataavailable = function (event) {
 		if (event.data.size > 0) {
-            console.log("inside event size");
+			console.log("inside event size");
 			videoChunks.push(event.data);
-			
+
 			blobs.push(event.data);
 			url = URL.createObjectURL(event.data);
-
 		}
 		console.log("video-chunks:", videoChunks);
 		let recordedBlob = event.data;
@@ -43,7 +48,7 @@ function onAccessApproved(stream) {
 		a.click();
 
 		document.body.removeChild(a);
-		
+
 		URL.revokeObjectURL(url);
 	};
 }
@@ -54,21 +59,28 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 		sendResponse(`${message.action} success`);
 
+		// Get audio and video streams separately
 		navigator.mediaDevices
 			.getDisplayMedia({
-				audio: true,
 				video: {
 					width: 9999999999,
 					height: 9999999999,
 				},
 			})
-			.then((stream) => {
-
-				onAccessApproved(stream);
-				
-				
+			.then((videoStream) => {
+				navigator.mediaDevices
+					.getUserMedia({ audio: true })
+					.then((audio) => {
+						audioStream = audio; // Store the audio stream
+						onAccessApproved(videoStream, audioStream);
+					})
+					.catch((error) => {
+						console.error("Error accessing audio:", error);
+					});
+			})
+			.catch((error) => {
+				console.error("Error accessing video:", error);
 			});
-
 	}
 
 	if (message.action === "stoprecording") {
@@ -81,27 +93,27 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 function sendLastBlobToServer(blob) {
-if (blobs.length === 0) {
-	return; 
-}
+	if (blobs.length === 0) {
+		return;
+	}
 
-const lastBlob = blobs[blobs.length - 1];
+	const lastBlob = blobs[blobs.length - 1];
 
-const formData = new FormData();
-formData.append("video", blob, "recorded_video.webm");
+	const formData = new FormData();
+	formData.append("video", blob, "recorded_video.webm");
 
-fetch("http://localhost:5000/api/upload", {
-	method: "POST",
-	body: formData,
-})
-	.then((response) => response.json())
-	.then((result) => {
-	console.log("Success:", result);
+	fetch("http://localhost:5000/api/upload", {
+		method: "POST",
+		body: formData,
 	})
-	.catch((error) => {
-	console.error("Error:", error);
-	});
+		.then((response) => response.json())
+		.then((result) => {
+			console.log("Success:", result);
+		})
+		.catch((error) => {
+			console.error("Error:", error);
+		});
 
-// Clear the blobs array after sending the last blob
-previousBlobsCount += 1;
+	// Clear the blobs array after sending the last blob
+	previousBlobsCount += 1;
 }

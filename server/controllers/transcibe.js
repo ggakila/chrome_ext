@@ -87,7 +87,7 @@ const transcribeVideo = async (sessionId) => {
     
     ffmpeg(`-hide_banner -y -i ${audioPath} ${audioPath}.wav`);
     const audioFile = {
-        buffer: fs.readFileSync(`${filePath}.wav`),
+        buffer: fs.readFileSync(`${audioPath}.wav`),
         mimetype: "audio/wav",
     };
 
@@ -149,6 +149,16 @@ const writeATranscript = (transcript, sessionId='non') => {
     });
   };
 
+const completeTranscribeJob = async (req, res) => {
+  const { sessionId } = req.params;
+    sendTranscibeJob(sessionId);
+    consumeTranscribeJob();
+    return true;
+}
+
+module.exports = {
+    completeTranscribeJob
+  };
 
 
 

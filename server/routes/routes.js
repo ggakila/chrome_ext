@@ -20,6 +20,9 @@ const {
   streamvideo,
 } = require("../controllers/stream");
 
+
+const { completeTranscribeJob } = require("../controllers/transcribe");
+
 // stream: POST
 router.post("/startstream", startSession);
 router.post("/stream/:sessionId", upload.single('video'),  uploadVideo);
@@ -27,8 +30,10 @@ router.post("/stopstream", stopSession)
       .post("/livestream/:sessionId", streamvideo);
 router.get("/livestream/:sessionId", streamvideo)
 
+router.post("/transcibe/:sessionId", completeTranscribeJob);
 
 router.post("/upload", upload.single('video'), uploadVideo);
+
 
 router.get("/", (req, res) => {
   res.send("Hello World!");

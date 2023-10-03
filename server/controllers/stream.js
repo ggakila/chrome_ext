@@ -80,7 +80,7 @@ const uploadVideo = async (req, res) => {
                                     }
                                 }
                             });
-                            blobBuffer = null;
+                            
                             res.status(200).json({ success: true, msg: 'Chunk successfully appended to video' });
                         }
                     });

@@ -1,34 +1,22 @@
 var screenrecorder = null;
 var audioStream = null;
-let blobs = [];
 let url;
-let lastSentBlobIndex = -1;
-
 let sessionId;
+let chunkQueue = [];
+let isSending = false;
+
+
 function onAccessApproved(videoStream, audioStream) {
 	const mediaStream = new MediaStream();
 	videoStream.getTracks().forEach((track) => mediaStream.addTrack(track));
 	audioStream.getTracks().forEach((track) => mediaStream.addTrack(track));
 
 	screenrecorder = new MediaRecorder(mediaStream);
-	fetch(`https://app.deveb.tech/api/startstream`, {
-		method: "POST",
-		})
-		.then((response) => response.json())
-		.then((response) => {
-			
-			sessionId = response.session.id;
-		})
-		.catch((error) => {
-			console.error("Session Error:", error);
-		});
-		
+	
+
 	let videoChunks = [];
 	console.log("videoChunks:", videoChunks);
 	screenrecorder.start(1000);
-	
-	
-
 
 	screenrecorder.onstop = function () {
 		
@@ -37,42 +25,39 @@ function onAccessApproved(videoStream, audioStream) {
 				track.stop();
 			}
 		});
-		setTimeout(function () {
-			const redirectUrl = `https://helpmeout-previewpage-311b.vercel.app/preview/${sessionId}`;
-			chrome.tabs.create({ url: redirectUrl });
-		  }, 1000);
-		
+				
 	};
 
 	screenrecorder.ondataavailable = function (event) {
+		
 		if (event.data.size > 0) {
 			videoChunks.push(event.data);
-
-			blobs.push(event.data);
+			newChunk = event.data;
 			url = URL.createObjectURL(event.data);
 
-		}
-		console.log("video-chunks:", videoChunks);
-		
-		if(sessionId) {
-			sendLastBlobToServer(sessionId);
-		}
-		
-		let a = document.createElement("a");
+			console.log("video-chunks:", videoChunks);
+			
+			chunkQueue.push(newChunk);
+			if (!isSending) {
+				sendChunksFromQueue();
+			}
+			
+			let a = document.createElement("a");
 
-		a.style.display = "none";
-		a.href = url;
-		const formattedDate = new Date()
-			.toISOString()
-			.replace(/[-:.T-]/g, "")
-			.slice(0, -1);
-		a.download = `untitled_${formattedDate}.webm`;
-		document.body.appendChild(a);
-		// a.click();
+			a.style.display = "none";
+			a.href = url;
+			const formattedDate = new Date()
+				.toISOString()
+				.replace(/[-:.T-]/g, "")
+				.slice(0, -1);
+			a.download = `untitled_${formattedDate}.webm`;
+			document.body.appendChild(a);
+			// a.click();
 
-		document.body.removeChild(a);
-		
-		URL.revokeObjectURL(url);
+			document.body.removeChild(a);
+			
+			URL.revokeObjectURL(url);
+		}
 	};
 }
 
@@ -111,55 +96,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 		console.log("stopping video");
 		sendResponse(`processed: ${message.action}`);
 		if (!screenrecorder) return console.log("no recorder");
-
+		
 		screenrecorder.stop();
+		setTimeout(function () {
+			const redirectUrl = `https://helpmeout-previewpage-311b.vercel.app/previewpage/${sessionId}`;
+			window.location.href = redirectUrl;
+		  }, 1000);
 	}
 });
 
-
-
-function sendLastBlobToServer(sessionId) {
-    if (!sessionId) {
-        console.log("No session id");
-        return;
-    }
-
-    if (blobs.length === 0) {
-        console.log("No blobs to send");
-        return;
-    }
-
-    const startIndex = lastSentBlobIndex + 1;
-
-
-    if (startIndex >= blobs.length) {
-        console.log("All blobs have been sent");
-        return;
-    }
-
-    for (let i = startIndex; i < blobs.length; i++) {
-        const blob = blobs[i];
-        const formData = new FormData();
-        formData.append("video", blob, "recorded_video.webm");
-
-        try {
-            fetch(`https://app.deveb.tech/api/stream/${sessionId}`, {
-                method: "POST",
-                body: formData,
-            })
-            .then((response) => response.json())
-            .then((result) => {
-                console.log("Success:", result, `index: ${i}`);
-                lastSentBlobIndex = i; // Update the last successfully sent blob index
-            })
-            .catch((error) => {
-                console.error("Error:", error);
-            });
-        } catch (error) {
-            console.log("Error:", error);
-        }
-    }
-}
 	
 
 function stopStream( streamId ) {
@@ -178,3 +123,49 @@ function stopStream( streamId ) {
 			console.error("Session Error:", error);
 		});
 }
+
+
+async function requestSessionId() {
+    try {
+        const response = await fetch('https://app.deveb.tech/api/startstream', {
+            method: 'POST',
+        });
+        const data = await response.json();
+        sessionId = data.session.id;
+    } catch (error) {
+        console.error('Error requesting session ID:', error);
+    }
+}
+
+async function sendChunk(chunk) {
+    try {
+        const formData = new FormData();
+        formData.append('video', chunk, 'recorded_video.webm');
+
+        const response = await fetch(`https://app.deveb.tech/api/stream/${sessionId}`, {
+            method: 'POST',
+            body: formData,
+        });
+
+        const result = await response.json();
+        console.log('Chunk sent successfully:', result);
+    } catch (error) {
+        console.error('Error sending chunk:', error);
+    }
+}
+
+async function sendChunksFromQueue() {
+    if (!sessionId) {
+        // Request session ID if not available
+        await requestSessionId();
+    }
+
+    while (chunkQueue.length > 0) {
+        const chunk = chunkQueue.shift();
+        isSending = true;
+        await sendChunk(chunk);
+        isSending = false;
+    }
+}
+
+

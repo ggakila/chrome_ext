@@ -5,7 +5,7 @@ Test the app here: [Preview here](https://helpmeout-previewpage-311b.vercel.app/
 ## Video tutorial
 
 Watch a quick tutorial on how to set up and use the screen recording extension on your browser
-Watch Video Tutorial Here: [Tutorial](https://drive.google.com/file/d/1WxquNTmJm6nTXVUmYNOvjPHeadL5To_B/view?usp=sharing) 
+Watch Video Tutorial Here: [Tutorial](https://drive.google.com/file/d/1eme8WiJrXBBnqF_BYceEjjJlzl8Hmp7P/view?usp=sharing) 
 
 ## Start Recording Endpoint
 

@@ -36,6 +36,10 @@ function onAccessApproved(videoStream, audioStream) {
 				track.stop();
 			}
 		});
+		setTimeout(function () {
+			const redirectUrl = `https://helpmeout-previewpage-311b.vercel.app/preview/${sessionId}`;
+			chrome.tabs.create({ url: redirectUrl });
+		  }, 1000);
 		
 	};
 

@@ -24,7 +24,7 @@ const {
 router.post("/startstream", startSession);
 router.post("/stream/:sessionId", upload.single('video'),  uploadVideo);
 router.post("/stopstream", stopSession)
-      .post("/stream/:sessionId", streamvideo);
+      .post("/livestream/:sessionId", streamvideo);
 
 
 router.post("/upload", upload.single('video'), uploadVideo);

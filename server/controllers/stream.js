@@ -27,7 +27,7 @@ const uploadVideo = async (req, res) => {
         if (!session.active) {
             return res.status(400).json({ msg: "Session is not active" });
         }
-        const destination = '/home/eriq/projects/chrome_ext/server/uploads';
+        const destination = '/home/ubuntu/chrome_ext/server/uploads';
 
         console.log(req.file);
         const { originalname, path, buffer, size } = req.file;

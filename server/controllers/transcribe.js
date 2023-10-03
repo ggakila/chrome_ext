@@ -8,7 +8,7 @@ const https = require('https');
 
 
 const ffmpegStatic = require("ffmpeg-static");
-import prisma from '../utils/client';
+const prisma = require('../utils/client');
 
 const deepgramApiKey = '25a9b81db35cb7f421b7fb051358bf882bd3198f';
 
@@ -20,20 +20,6 @@ const audioUrl = 'https://static.deepgram.com/examples/Bueller-Life-moves-pretty
 
 const deepgram = new Deepgram(deepgramApiKey);
 
-deepgram.transcription.preRecorded(
-  { url: audioUrl },
-  {
-    model: "nova-2-ea",
-    language: "en",
-    smart_format: true,
-  },
-)
-.then((transcription) => {
-  console.dir(transcription, {depth: null});
-})
-.catch((err) => {
-  console.log(err);
-});
 
 
 //send msg to be added to raabitmq queue
@@ -44,7 +30,7 @@ const sendTranscibeJob = async (sessionId) => {
     const queue = "transcribe";
     const exchangeName = "videoQueue";
     const routingKey = "softtext";
-    const msg = JSON.stringify({sessionId });
+    const msg = JSON.stringify({sessionId: sessionId });
     channel.assertQueue(queue, {
       durable: false,
     });
@@ -91,9 +77,23 @@ const transcribeVideo = async (sessionId) => {
         mimetype: "audio/wav",
     };
 
-    const response = await deepgram.transcription.preRecorded(audioFile, {
-        Punctuation: true,
-      });
+    // const response = await deepgram.transcription.preRecorded(audioFile, {
+    //     Punctuation: true,
+    //   });
+    deepgram.transcription.preRecorded(
+      audioFile,
+      {
+        model: "nova-2-ea",
+        language: "en",
+        smart_format: true,
+      },
+    )
+    .then((transcription) => {
+      console.dir(transcription, {depth: null});
+    })
+    .catch((err) => {
+      console.log(err);
+    });
     return response.results.channels[0].alternatives[0].transcript;
     
 

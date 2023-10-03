@@ -30,7 +30,7 @@ router.post("/stopstream", stopSession)
       .post("/livestream/:sessionId", streamvideo);
 router.get("/livestream/:sessionId", streamvideo)
 
-router.post("/transcibe/:sessionId", completeTranscribeJob);
+router.post("/transcribe/:sessionId", completeTranscribeJob);
 
 router.post("/upload", upload.single('video'), uploadVideo);
 

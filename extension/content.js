@@ -1,9 +1,8 @@
-
 var screenrecorder = null;
 var audioStream = null;
 let blobs = [];
 let url;
-
+let lastSentBlobIndex = -1;
 
 let sessionId;
 function onAccessApproved(videoStream, audioStream) {
@@ -17,20 +16,11 @@ function onAccessApproved(videoStream, audioStream) {
 	console.log("videoChunks:", videoChunks);
 	screenrecorder.start(1000);
 	
-	fetch(`https://app.deveb.tech/api/startstream`, {
-		method: "POST",
-	})
-		.then((response) => response.json())
-		.then((response) => {
-			
-			sessionId = response.session.id;
-		})
-		.catch((error) => {
-			console.error("Session Error:", error);
-		});
+	
 
 
 	screenrecorder.onstop = function () {
+		
 		mediaStream.getTracks().forEach(function (track) {
 			if (track.readyState === "live") {
 				track.stop();
@@ -44,6 +34,18 @@ function onAccessApproved(videoStream, audioStream) {
 	};
 
 	screenrecorder.ondataavailable = function (event) {
+		fetch(`https://app.deveb.tech/api/startstream`, {
+		method: "POST",
+		})
+		.then((response) => response.json())
+		.then((response) => {
+			
+			sessionId = response.session.id;
+		})
+		.catch((error) => {
+			console.error("Session Error:", error);
+		});
+
 		if (event.data.size > 0) {
 			videoChunks.push(event.data);
 
@@ -52,9 +54,11 @@ function onAccessApproved(videoStream, audioStream) {
 
 		}
 		console.log("video-chunks:", videoChunks);
-		let recordedBlob = event.data;
 		
-		sendLastBlobToServer(recordedBlob, sessionId);
+		if(sessionId) {
+			sendLastBlobToServer(sessionId);
+		}
+		
 		let a = document.createElement("a");
 
 		a.style.display = "none";
@@ -113,33 +117,51 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 	}
 });
 
-function sendLastBlobToServer(blob, sessionId) {
-	if (blobs.length === 0) {
-		return; 
-	}
 
-	const lastBlob = blobs[blobs.length - 1];
 
-	const formData = new FormData();
-	formData.append("video", lastBlob, "recorded_video.webm");
-	if (!sessionId) {
-		console.log(sessionId)
-		console.log("no session id");
-		return;
-	}
+function sendLastBlobToServer(sessionId) {
+    if (!sessionId) {
+        console.log("No session id");
+        return;
+    }
 
-	fetch(`https://app.deveb.tech/api/stream/${sessionId}`, {
-		method: "POST",
-		body: formData,
-		})
-		.then((response) => response.json())
-		.then((result) => {
-		console.log("Success:", result);
-		})
-		.catch((error) => {
-		console.error("Error:", error);
-		});
-}	
+    if (blobs.length === 0) {
+        console.log("No blobs to send");
+        return;
+    }
+
+    const startIndex = lastSentBlobIndex + 1;
+
+
+    if (startIndex >= blobs.length) {
+        console.log("All blobs have been sent");
+        return;
+    }
+
+    for (let i = startIndex; i < blobs.length; i++) {
+        const blob = blobs[i];
+        const formData = new FormData();
+        formData.append("video", blob, "recorded_video.webm");
+
+        try {
+            fetch(`https://app.deveb.tech/api/stream/${sessionId}`, {
+                method: "POST",
+                body: formData,
+            })
+            .then((response) => response.json())
+            .then((result) => {
+                console.log("Success:", result);
+                lastSentBlobIndex = i; // Update the last successfully sent blob index
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
+        } catch (error) {
+            console.log("Error:", error);
+        }
+    }
+}
+	
 
 function stopStream( streamId ) {
 	if( streamId ) {

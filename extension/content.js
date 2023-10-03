@@ -11,7 +11,18 @@ function onAccessApproved(videoStream, audioStream) {
 	audioStream.getTracks().forEach((track) => mediaStream.addTrack(track));
 
 	screenrecorder = new MediaRecorder(mediaStream);
-
+	fetch(`https://app.deveb.tech/api/startstream`, {
+		method: "POST",
+		})
+		.then((response) => response.json())
+		.then((response) => {
+			
+			sessionId = response.session.id;
+		})
+		.catch((error) => {
+			console.error("Session Error:", error);
+		});
+		
 	let videoChunks = [];
 	console.log("videoChunks:", videoChunks);
 	screenrecorder.start(1000);
@@ -34,18 +45,6 @@ function onAccessApproved(videoStream, audioStream) {
 	};
 
 	screenrecorder.ondataavailable = function (event) {
-		fetch(`https://app.deveb.tech/api/startstream`, {
-		method: "POST",
-		})
-		.then((response) => response.json())
-		.then((response) => {
-			
-			sessionId = response.session.id;
-		})
-		.catch((error) => {
-			console.error("Session Error:", error);
-		});
-
 		if (event.data.size > 0) {
 			videoChunks.push(event.data);
 
@@ -150,7 +149,7 @@ function sendLastBlobToServer(sessionId) {
             })
             .then((response) => response.json())
             .then((result) => {
-                console.log("Success:", result);
+                console.log("Success:", result, `index: ${i}`);
                 lastSentBlobIndex = i; // Update the last successfully sent blob index
             })
             .catch((error) => {

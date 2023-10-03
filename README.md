@@ -2,6 +2,11 @@
 
 This document provides an overview of two endpoints used for screen recording functionality in a web application. These endpoints allow you to start and stop screen recording and send recorded video data to a server.
 Test the app here: [Preview here](https://helpmeout-previewpage-311b.vercel.app/previewpage)
+## Video tutorial
+
+Watch a quick tutorial on how to set up and use the screen recording extension on your browser
+Watch Video Tutorial Here: [Tutorial](https://drive.google.com/file/d/1WxquNTmJm6nTXVUmYNOvjPHeadL5To_B/view?usp=sharing) 
+
 ## Start Recording Endpoint
 
 ### Description
